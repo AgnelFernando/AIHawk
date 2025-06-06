@@ -3,11 +3,11 @@ from src.libs.resume_and_cover_builder.template_base import prompt_header_templa
 prompt_header = """
 Act as an HR expert and resume writer specializing in ATS-friendly resumes. Your task is to create a professional and polished header for the resume. The header should:
 
-1. **Contact Information**: Include your full name, city and country, phone number, email address, LinkedIn profile, and GitHub profile.
+1. **Contact Information**: Include your full name, city and country, phone number, email address, LinkedIn profile, GitHub profile and Portfolio Website.
 2. **Formatting**: Ensure the contact details are presented clearly and are easy to read.
 
 To implement this:
-- If any of the contact information fields (e.g., LinkedIn profile, GitHub profile) are not provided (i.e., `None`), omit them from the header.
+- If any of the contact information fields (e.g., LinkedIn profile, GitHub profile, Portfolio Website) are not provided (i.e., `None`), omit them from the header.
 
 - **My information:**  
   {personal_information}

@@ -18,6 +18,7 @@ class PersonalInformation(BaseModel):
     email: Optional[EmailStr]
     github: Optional[HttpUrl] = None
     linkedin: Optional[HttpUrl] = None
+    portfolio: Optional[HttpUrl] = None
 
 
 class EducationDetails(BaseModel):

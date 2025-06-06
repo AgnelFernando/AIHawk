@@ -49,12 +49,14 @@ prompt_header_template = """
     <p class="fas fa-envelope">
       <span>[Your Email]</span>
     </p> 
-    <p class="fab fa-linkedin">
-      <a href="[Link LinkedIn account]">LinkedIn</a>
-    </p> 
-    <p class="fab fa-github">
-      <a href="[Link GitHub account]">GitHub</a>
-    </p> 
+    <p>
+      <span class="fab fa-linkedin"></span>
+      <a href="[Link LinkedIn account]">LinkedIn</a> |
+      <span class="fab fa-github"></span>
+      <a href="[Link GitHub account]">GitHub</a> |
+      <span class="fas fa-briefcase"></span>
+      <a href="[Link Portfolio account]">Portfolio</a>
+    </p>  
   </div>
 </header>
 ```
