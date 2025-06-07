@@ -3,6 +3,7 @@ This module contains the FacadeManager class, which is responsible for managing 
 """
 # app/libs/resume_and_cover_builder/manager_facade.py
 import hashlib
+import os
 import inquirer
 from pathlib import Path
 
@@ -68,13 +69,26 @@ class ResumeFacade:
         ]
         return inquirer.prompt(questions)['text']
 
+    def link_to_job_from_file(self, job_file_path):
+        with open(job_file_path, 'r', encoding='utf-8') as file:
+            job_text = file.read()
+        self.llm_job_parser = LLMParser(openai_api_key=global_config.API_KEY)
+        self.llm_job_parser.set_plain_text(job_text)
+
+        self.job = Job()
+        self.job.role = self.llm_job_parser.extract_role()
+        self.job.company = self.llm_job_parser.extract_company_name()
+        self.job.description = self.llm_job_parser.extract_job_description()
+        self.job.location = self.llm_job_parser.extract_location()
+        self.job.link = job_file_path  # Can store the path instead of URL
+        logger.info(f"Extracting job details from file: {job_file_path}")
         
     def link_to_job(self, job_url):
         self.driver.get(job_url)
         self.driver.implicitly_wait(10)
         body_element = self.driver.find_element("tag name", "body")
         body_element = body_element.get_attribute("outerHTML")
-        self.llm_job_parser = LLMParser(openai_api_key=global_config.API_KEY, model=global_config.MODEL)
+        self.llm_job_parser = LLMParser(openai_api_key=global_config.API_KEY)
         self.llm_job_parser.set_body_html(body_element)
 
         self.job = Job()
@@ -84,6 +98,11 @@ class ResumeFacade:
         self.job.location = self.llm_job_parser.extract_location()
         self.job.link = job_url
         logger.info(f"Extracting job details from URL: {job_url}")
+
+    @staticmethod
+    def to_camel_case(text: str) -> str:
+        words = text.split()
+        return words[0].lower() + ''.join(word.capitalize() for word in words[1:])
 
 
     def create_resume_pdf_job_tailored(self) -> tuple[bytes, str]:
@@ -102,12 +121,16 @@ class ResumeFacade:
 
         html_resume = self.resume_generator.create_resume_job_description_text(style_path, self.job.description)
 
-        # Generate a unique name using the job URL hash
-        suggested_name = hashlib.md5(self.job.link.encode()).hexdigest()[:10]
+        # Generate folder and filename
+        company_folder = self.job.company.strip().replace(" ", "")  # Company name without spaces
+        job_filename = self.to_camel_case(self.job.role)  # CamelCase job name
+
+        # Full path to the file
+        full_path = os.path.join(company_folder, f"{job_filename}.pdf")
         
         result = HTML_to_PDF(html_resume, self.driver)
         self.driver.quit()
-        return result, suggested_name
+        return result, full_path
     
     
     
@@ -146,7 +169,7 @@ class ResumeFacade:
         cover_letter_html = self.resume_generator.create_cover_letter_job_description(style_path, self.job.description)
 
         # Generate a unique name using the job URL hash
-        suggested_name = hashlib.md5(self.job.link.encode()).hexdigest()[:10]
+        suggested_name = hashlib.md5((self.job.company + "_"+self.job.role).encode()).hexdigest()[:10]
 
         
         result = HTML_to_PDF(cover_letter_html, self.driver)

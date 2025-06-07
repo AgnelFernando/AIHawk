@@ -19,6 +19,8 @@ Act as an HR expert and resume writer with a specialization in creating ATS-frie
 3. **Grade**: Include your Grade if it is strong and relevant.
 4. **Relevant Coursework**: List key courses with their grades to showcase your academic strengths.
 
+If any of the education details (e.g., institution, degree, field of study, exam) are not provided (i.e., None), omit those sections when filling out the template.
+
 - **My information:**  
   {education_details}
 """+ prompt_education_template
@@ -79,14 +81,25 @@ If any of the certification details (e.g., descriptions) are not provided (i.e.,
 
 
 prompt_additional_skills = """
-Act as an HR expert and resume writer with a specialization in creating ATS-friendly resumes. Your task is to list additional skills relevant to the job. For each skill, ensure you include:
+Act as an HR expert and resume writer with a specialization in creating ATS-friendly resumes. Your task is to list skills with category relevant to the job. For each skill, ensure you include:
 
-1. **Skill Category**: Clearly state the category or type of skill.
-2. **Specific Skills**: List the specific skills or technologies within each category.
-3. **Proficiency and Experience**: Briefly describe your experience and proficiency level.
+For each skill category, ensure you:
+
+1. Do not add any information beyond what is listed in the provided data fields.
+
+2. Only use the information provided in the interests, exp_skills and skills fields to formulate your responses.
+
+3. Avoid extrapolating, guessing, or incorporating details from the job description or any external sources.
+
+Instructions:
+
+1. Skill Category: Clearly state the category or type of skill.
+
+2. Specific Skills: List the specific skills or technologies within each category And atleast add more than two skills per category.
+
+3. Remove the category if it has no skills.
 
 - **My information:**  
-  {languages}
-  {interests}
   {skills}
+
 """+ prompt_additional_skills_template

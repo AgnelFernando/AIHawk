@@ -221,23 +221,10 @@ class LLMResumer:
         """
         additional_skills_prompt_template = self._preprocess_template_string(self.strings.prompt_additional_skills)
         
-        skills = set()
-        if self.resume.experience_details:
-            for exp in self.resume.experience_details:
-                if exp.skills_acquired:
-                    skills.update(exp.skills_acquired)
-
-        if self.resume.education_details:
-            for edu in self.resume.education_details:
-                if edu.exam:
-                    for exam in edu.exam:
-                        skills.update(exam.keys())
         prompt = ChatPromptTemplate.from_template(additional_skills_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         input_data = {
-            "languages": self.resume.languages,
-            "interests": self.resume.interests,
-            "skills": skills,
+            "skills": self.resume.skills
         } if data is None else data
         output = chain.invoke(input_data)
         

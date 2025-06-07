@@ -4,6 +4,10 @@ import yaml
 from pydantic import BaseModel, EmailStr, HttpUrl, Field
 
 
+@dataclass
+class SkillCategory:
+    category: str
+    technologies: List[str]
 
 class PersonalInformation(BaseModel):
     name: Optional[str]
@@ -98,6 +102,7 @@ class Resume(BaseModel):
     certifications: Optional[List[Certifications]] = None
     languages: Optional[List[Language]] = None
     interests: Optional[List[str]] = None
+    skills: Optional[List[SkillCategory]] = None
 
     @staticmethod
     def normalize_exam_format(exam):
@@ -114,6 +119,9 @@ class Resume(BaseModel):
                 for ed in data['education_details']:
                     if 'exam' in ed:
                         ed['exam'] = self.normalize_exam_format(ed['exam'])
+
+            if 'skills' in data:
+                data['skills'] = [SkillCategory(**skill) for skill in data['skills']]
 
             # Create an instance of Resume from the parsed data
             super().__init__(**data)

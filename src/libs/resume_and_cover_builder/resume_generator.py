@@ -7,12 +7,14 @@ from typing import Any
 from src.libs.resume_and_cover_builder.llm.llm_generate_resume import LLMResumer
 from src.libs.resume_and_cover_builder.llm.llm_generate_resume_from_job import LLMResumeJobDescription
 from src.libs.resume_and_cover_builder.llm.llm_generate_cover_letter_from_job import LLMCoverLetterJobDescription
+from src.libs.resume_and_cover_builder.mock_llm import MockLLMResumer
 from .module_loader import load_module
 from .config import global_config
 
 class ResumeGenerator:
-    def __init__(self):
-        pass
+    def __init__(self, offline_mode=False, saved_responses_path=None):
+        self.offline_mode = offline_mode
+        self.saved_responses_path = saved_responses_path
     
     def set_resume_object(self, resume_object):
          self.resume_object = resume_object
@@ -40,8 +42,11 @@ class ResumeGenerator:
         return template.substitute(body=body_html, style_css=style_css)
 
     def create_resume(self, style_path):
-        strings = load_module(global_config.STRINGS_MODULE_RESUME_PATH, global_config.STRINGS_MODULE_NAME)
-        gpt_answerer = LLMResumer(global_config.API_KEY, strings)
+        if self.offline_mode:
+            gpt_answerer = MockLLMResumer(self.saved_responses_path)
+        else:
+            strings = load_module(global_config.STRINGS_MODULE_RESUME_PATH, global_config.STRINGS_MODULE_NAME)
+            gpt_answerer = LLMResumer(global_config.API_KEY, strings)
         return self._create_resume(gpt_answerer, style_path)
 
     def create_resume_job_description_text(self, style_path: str, job_description_text: str):
@@ -61,5 +66,8 @@ class ResumeGenerator:
             style_css = f.read()
         return template.substitute(body=cover_letter_html, style_css=style_css)
     
+    def create_resume_from_saved(self, style_path, saved_responses_path):
+        gpt_answerer = MockLLMResumer(saved_responses_path)
+        return self._create_resume(gpt_answerer, style_path)
     
     

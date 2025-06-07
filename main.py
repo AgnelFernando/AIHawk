@@ -1,4 +1,5 @@
 import base64
+import os
 import sys
 from pathlib import Path
 import traceback
@@ -211,8 +212,8 @@ class FileManager:
         """Convert resume file paths to a dictionary."""
         if not plain_text_resume_file.exists():
             raise FileNotFoundError(f"Plain text resume file not found: {plain_text_resume_file}")
-
-        uploads = {"plainTextResume": plain_text_resume_file}
+        
+        uploads = {"plainTextResume": plain_text_resume_file, "jobDescriptionFile": Path("data_folder/job_description.txt")}
 
         return uploads
 
@@ -304,7 +305,8 @@ def create_cover_letter(parameters: dict, llm_api_key: str):
         raise
 
 
-def create_resume_pdf_job_tailored(parameters: dict, llm_api_key: str):
+def create_resume_pdf_job_tailored(parameters: dict, llm_api_key: str, 
+                                   use_file: bool = False):
     """
     Logic to create a CV.
     """
@@ -340,9 +342,6 @@ def create_resume_pdf_job_tailored(parameters: dict, llm_api_key: str):
                         break
             else:
                 logger.warning("No style selected. Proceeding with default style.")
-        questions = [inquirer.Text('job_url', message="Please enter the URL of the job description:")]
-        answers = inquirer.prompt(questions)
-        job_url = answers.get('job_url')
         resume_generator = ResumeGenerator()
         resume_object = Resume(plain_text_resume)
         driver = init_browser()
@@ -355,8 +354,22 @@ def create_resume_pdf_job_tailored(parameters: dict, llm_api_key: str):
             output_path=Path("data_folder/output"),
         )
         resume_facade.set_driver(driver)
-        resume_facade.link_to_job(job_url)
-        result_base64, suggested_name = resume_facade.create_resume_pdf_job_tailored()         
+        if not use_file:
+            questions = [inquirer.Text('job_url', message="Please enter the URL of the job description:")]
+            answers = inquirer.prompt(questions)
+            job_url = answers.get('job_url')
+            resume_facade.link_to_job(job_url)
+        else:
+            resume_facade.link_to_job_from_file(
+                parameters["uploads"]["jobDescriptionFile"]
+            )
+        result_base64, suggested_path = resume_facade.create_resume_pdf_job_tailored()  
+
+        # suggested_path is like 'CompanyFolder/JobFileName.pdf'
+        company_folder, job_filename = os.path.split(suggested_path)
+    
+        # Define the output directory from parameters and add the company folder
+        output_dir = Path(parameters["outputFileDirectory"]) / company_folder       
 
         # Decodifica Base64 in dati binari
         try:
@@ -365,9 +378,6 @@ def create_resume_pdf_job_tailored(parameters: dict, llm_api_key: str):
             logger.error("Error decoding Base64: %s", e)
             raise
 
-        # Definisci il percorso della cartella di output utilizzando `suggested_name`
-        output_dir = Path(parameters["outputFileDirectory"]) / suggested_name
-
         # Crea la cartella se non esiste
         try:
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -375,8 +385,8 @@ def create_resume_pdf_job_tailored(parameters: dict, llm_api_key: str):
         except IOError as e:
             logger.error("Error creating output directory: %s", e)
             raise
-        
-        output_path = output_dir / "resume_tailored.pdf"
+
+        output_path = output_dir / Path(job_filename)
         try:
             with open(output_path, "wb") as file:
                 file.write(pdf_data)
@@ -481,6 +491,10 @@ def handle_inquiries(selected_actions: List[str], parameters: dict, llm_api_key:
             if "Generate Resume" == selected_actions:
                 logger.info("Crafting a standout professional resume...")
                 create_resume_pdf(parameters, llm_api_key)
+
+            if "Generate Resume Tailored for Job Description File" == selected_actions:
+                logger.info("Customizing your resume to enhance your job application...")
+                create_resume_pdf_job_tailored(parameters, llm_api_key, use_file=True)
                 
             if "Generate Resume Tailored for Job Description" == selected_actions:
                 logger.info("Customizing your resume to enhance your job application...")
@@ -509,6 +523,7 @@ def prompt_user_action() -> str:
                 message="Select the action you want to perform:",
                 choices=[
                     "Generate Resume",
+                    "Generate Resume Tailored for Job Description File",
                     "Generate Resume Tailored for Job Description",
                     "Generate Tailored Cover Letter for Job Description",
                 ],

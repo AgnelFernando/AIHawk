@@ -16,6 +16,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import TokenTextSplitter
 from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain.schema import Document
 from lib_resume_builder_AIHawk.config import global_config
 from langchain_community.document_loaders import TextLoader
 from requests.exceptions import HTTPError as HTTPStatusError  # HTTP error handling
@@ -48,7 +49,7 @@ class LLMParser:
         Preprocess the template string by removing leading whitespaces and indentation.
         Args:
             template (str): The template string to preprocess.
-        Returns:
+        Returns: 
             str: The preprocessed template string.
         """
         return textwrap.dedent(template)
@@ -86,6 +87,32 @@ class LLMParser:
             logger.debug("Vectorstore successfully initialized.")
         except Exception as e:
             logger.error(f"Error during vectorstore creation: {e}")
+            raise
+
+    def set_plain_text(self, plain_text):
+        """
+        Set job description from plain text and initialize the vectorstore.
+        Args:
+            plain_text (str): The plain text content to process.
+        """
+        try:
+            document = Document(page_content=plain_text)
+            logger.debug("Plain text document successfully loaded.")
+        except Exception as e:
+            logger.error(f"Error during document loading from text: {e}")
+            raise
+        
+        # Split the text into chunks
+        text_splitter = TokenTextSplitter(chunk_size=500, chunk_overlap=50)
+        all_splits = text_splitter.split_documents([document])
+        logger.debug(f"Text split into {len(all_splits)} fragments.")
+        
+        # Create the vectorstore using FAISS
+        try:
+            self.vectorstore = FAISS.from_documents(documents=all_splits, embedding=self.llm_embeddings)
+            logger.debug("Vectorstore successfully initialized from plain text.")
+        except Exception as e:
+            logger.error(f"Error during vectorstore creation from plain text: {e}")
             raise
 
     def _retrieve_context(self, query: str, top_k: int = 3) -> str:
@@ -170,7 +197,7 @@ class LLMParser:
         Returns:
             str: The extracted role/title.
         """
-        question = "What is the role or title sought in this job description?"
+        question = "Identify and extract only the job title from this job description."
         retrieval_query = "Job title"
         logger.debug("Starting role/title extraction.")
         return self._extract_information(question, retrieval_query)

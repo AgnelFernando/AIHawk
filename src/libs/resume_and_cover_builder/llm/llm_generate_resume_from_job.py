@@ -105,30 +105,19 @@ class LLMResumeJobDescription(LLMResumer):
 
     def generate_additional_skills_section(self) -> str:
         """
-        Generate the additional skills section of the resume.
+        Generate the skills section of the resume.
         Returns:
             str: The generated additional skills section.
         """
         additional_skills_prompt_template = self._preprocess_template_string(
             self.strings.prompt_additional_skills
         )
-        skills = set()
-        if self.resume.experience_details:
-            for exp in self.resume.experience_details:
-                if exp.skills_acquired:
-                    skills.update(exp.skills_acquired)
 
-        if self.resume.education_details:
-            for edu in self.resume.education_details:
-                if edu.exam:
-                    for exam in edu.exam:
-                        skills.update(exam.keys())
+        
         prompt = ChatPromptTemplate.from_template(additional_skills_prompt_template)
         chain = prompt | self.llm_cheap | StrOutputParser()
         output = chain.invoke({
-            "languages": self.resume.languages,
-            "interests": self.resume.interests,
-            "skills": skills,
+            "skills": self.resume.skills,
             "job_description": self.job_description
         })
         return output

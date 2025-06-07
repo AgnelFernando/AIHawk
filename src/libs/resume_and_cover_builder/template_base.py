@@ -40,23 +40,33 @@ prompt_header_template = """
 <header>
   <h1>[Name and Surname]</h1>
   <div class="contact-info"> 
-    <p class="fas fa-map-marker-alt">
-      <span>[Your City, Your Country]</span>
-    </p> 
-    <p class="fas fa-phone">
-      <span>[Your Prefix Phone number]</span>
-    </p> 
-    <p class="fas fa-envelope">
-      <span>[Your Email]</span>
-    </p> 
-    <p>
-      <span class="fab fa-linkedin"></span>
-      <a href="[Link LinkedIn account]">LinkedIn</a> |
-      <span class="fab fa-github"></span>
-      <a href="[Link GitHub account]">GitHub</a> |
-      <span class="fas fa-briefcase"></span>
-      <a href="[Link Portfolio account]">Portfolio</a>
-    </p>  
+    <div>
+      <p class="fas fa-map-marker-alt">
+        <span>[Your City, Your Country]</span>
+      </p>
+      <p class="fas fa-phone">
+        <span>[Your Prefix Phone number]</span>
+      </p>
+      <p class="fas fa-envelope">
+        <span>[Your Email]</span>
+      </p> 
+    </div>
+    <div>
+      <p>
+        <span class="fab fa-linkedin"></span>
+        <a href="[Link LinkedIn account]">LinkedIn</a>
+        |
+      </p>
+      <p>
+        <span class="fab fa-github"></span>
+        <a href="[Link GitHub account]">GitHub</a>
+        |
+      </p> 
+      <p>
+        <span class="fas fa-briefcase"></span>
+        <a href="[Link Portfolio account]">Portfolio</a>
+      </p>
+    </div>
   </div>
 </header>
 ```
@@ -149,7 +159,7 @@ prompt_projects_template = """
 - **Template to Use**
 ```
 <section id="side-projects">
-    <h2>Side Projects</h2>
+    <h2>Projects</h2>
     <div class="entry">
       <div class="entry-header">
           <span class="entry-name"><i class="fab fa-github"></i> <a href="[Github Repo or Link]">[Project Name]</a></span>
@@ -216,25 +226,15 @@ prompt_additional_skills_template = """
 - **Template to Use**
 '''
 <section id="skills-languages">
-    <h2>Additional Skills</h2>
-    <div class="two-column">
-      <ul class="compact-list">
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-      </ul>
-      <ul class="compact-list">
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li>[Specific Skill or Technology]</li>
-          <li><strong>Languages:</strong> </li>
-      </ul>
-    </div>
+    <h2>Skills</h2>
+    <div class="skills-section">
+
+    <p><b>[Category Name]:</b> [Technology/ Skills], [Technology/ Skills], [Technology/ Skills]...</p>
+    <p><b>[Category Name]:</b> [Technology/ Skills], [Technology/ Skills], [Technology/ Skills]...</p>
+    <p><b>[Category Name]:</b> [Technology/ Skills], [Technology/ Skills], [Technology/ Skills]...</p>
+    <p><b>[Category Name]:</b> [Technology/ Skills], [Technology/ Skills], [Technology/ Skills]...</p>
+    ....
+   </div>
 </section>
 '''
 The results should be provided in html format, Provide only the html code for the resume, without any explanations or additional text and also without ```html ```

@@ -118,22 +118,23 @@ If any of the certification details (e.g., descriptions) are not provided (i.e.,
 
 
 prompt_additional_skills = """
-Act as an HR expert and resume writer with a specialization in creating ATS-friendly resumes. Your task is to list additional skills relevant to the job. For each skill, ensure you include:
-Do not add any information beyond what is listed in the provided data fields. Only use the information provided in the 'languages', 'interests', and 'skills' fields to formulate your responses. Avoid extrapolating or incorporating details from the job description or other external sources.
+- **Prompt**
+Act as an HR expert and resume writer specializing in ATS-friendly resumes. Your task is to list skills categorized by type, based only on the provided skills data.
 
-1. **Skill Category**: Clearly state the category or type of skill.
-2. **Specific Skills**: List the specific skills or technologies within each category.
-3. **Proficiency and Experience**: Briefly describe your experience and proficiency level.
+**Guidelines:**
 
-Ensure that the skills listed are relevant and accurately reflect your expertise in the field.
+* Use only the provided skills — no additions, assumptions, or external information.
+* Include only skills relevant to the job description.
+* Each category must have **3-9** skills.
+* Remove any category that ends up empty.
+* Modify the skill names to match the job description, ensuring they are relevant and specific.
 
-To implement this:
-- If any of the skill details (e.g., languages, interests, skills) are not provided (i.e., `None`), omit those sections when filling out the template.
+**Instructions:**
 
+* **Skill Category**: Clearly state the skill category.
+* **Specific Skills**: List the selected skills under each category.
 
 - **My information:**  
-  {languages}
-  {interests}
   {skills}
 
 - **Job Description:**  

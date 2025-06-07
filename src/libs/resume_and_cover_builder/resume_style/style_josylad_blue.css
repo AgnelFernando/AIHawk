@@ -32,6 +32,7 @@ h1 {
 .contact-info {
   display: flex;
   justify-content: center;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 15px;
   font-size: 10pt;
@@ -39,8 +40,16 @@ h1 {
   color: #ecf0f1;
 }
 
+.contact-info div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+}
+
 .contact-info p {
   margin: 0;
+  padding: 0 4px 0 4px;
 }
 
 .contact-info a {
@@ -123,16 +132,22 @@ a:hover {
   text-decoration: underline;
 }
 
+.skills-section {
+  padding: 2px 15px;
+}
+
 @media print {
   body {
     padding: 0;
-    margin: 0;
+    margin: 0 auto;   /* Center align */
     font-size: 9pt;
     background-color: #fff;
+    max-width: 698px; /* Control width for A4 minus margins */
+    box-sizing: border-box;
   }
 
   @page {
-    margin: 1cm;
+    margin: 1cm; /* Or override: set to 0, rely only on printToPDF margins */
   }
 
   h1 {
